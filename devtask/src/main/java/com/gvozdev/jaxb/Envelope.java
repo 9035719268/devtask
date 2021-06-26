@@ -1,11 +1,14 @@
 package com.gvozdev.jaxb;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "Envelope")
 @XmlType(propOrder = {"header", "body"})
+@JsonPropertyOrder({"header", "body"})
 public class Envelope {
     private String header;
     private String body;

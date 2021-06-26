@@ -15,12 +15,12 @@ public class ApplicationConfig {
     private String destAddr;
 
     @Value("${tcp.dest.port}")
-    private String destPort;
+    private int destPort;
 
     public ApplicationConfig() {
     }
 
-    public ApplicationConfig(int port, String destAddr, String destPort) {
+    public ApplicationConfig(int port, String destAddr, int destPort) {
         this.port = port;
         this.destAddr = destAddr;
         this.destPort = destPort;
@@ -42,11 +42,11 @@ public class ApplicationConfig {
         this.destAddr = destAddr;
     }
 
-    public String getDestPort() {
+    public int getDestPort() {
         return destPort;
     }
 
-    public void setDestPort(String destPort) {
+    public void setDestPort(int destPort) {
         this.destPort = destPort;
     }
 }

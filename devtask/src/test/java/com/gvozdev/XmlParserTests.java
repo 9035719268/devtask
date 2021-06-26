@@ -1,11 +1,12 @@
 package com.gvozdev;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gvozdev.jaxb.Envelope;
 import com.gvozdev.service.XmlParserService;
 import com.gvozdev.serviceimpl.XmlParserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -66,5 +67,14 @@ class XmlParserTests {
         XmlParserService xmlParserService = new XmlParserServiceImpl();
 
         assertThrows(UnmarshalException.class, () -> xmlParserService.getEnvelopeFromHttpRequest(request, response));
+    }
+
+    @Test
+    void shouldMarshalToJson() throws JsonProcessingException {
+        Envelope envelope = new Envelope(HEADER, BODY);
+
+        String jsonEnvelope = new ObjectMapper().writeValueAsString(envelope);
+
+        assertEquals("{\"header\":\"h\",\"body\":\"b\"}", jsonEnvelope);
     }
 }
