@@ -1,4 +1,4 @@
-package com.gvozdev;
+package com.gvozdev.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
