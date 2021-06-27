@@ -2,6 +2,7 @@ package com.gvozdev;
 
 import com.gvozdev.config.ApplicationConfig;
 import com.gvozdev.http.XmlParserServlet;
+import com.gvozdev.error.CustomErrorHandler;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -34,6 +35,7 @@ public class Bootstrap {
         HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(new Handler[]{resourceHandler, servletHandler, new DefaultHandler()});
         server.setHandler(handlerList);
+        server.setErrorHandler(new CustomErrorHandler());
 
         ServerConnector serverConnector = new ServerConnector(server, 1, 1, new HttpConnectionFactory());
         serverConnector.setHost(applicationConfig.getDestAddr());
