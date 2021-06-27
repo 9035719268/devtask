@@ -1,13 +1,14 @@
 package com.gvozdev.serviceimpl;
 
 import com.gvozdev.config.ApplicationConfig;
+import com.gvozdev.error.CustomErrorHandler;
 import com.gvozdev.service.TcpSenderService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.net.Socket;
 import java.util.List;
 import java.util.logging.Logger;
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 import static java.lang.String.valueOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.codec.binary.Hex.encodeHex;
 
 public class TcpSenderServiceImpl implements TcpSenderService {
@@ -28,7 +30,7 @@ public class TcpSenderServiceImpl implements TcpSenderService {
     );
 
     @Override
-    public void sendData() {
+    public void sendData(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
         ApplicationConfig applicationConfig = context.getBean("applicationConfig", ApplicationConfig.class);
 
@@ -51,7 +53,18 @@ public class TcpSenderServiceImpl implements TcpSenderService {
             LOGGER.info(valueOf(encodeHex(strings.get(3).getBytes(UTF_8))));
 
         } catch (IOException e) {
-            e.printStackTrace();
+            resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter);
+            e.printStackTrace(printWriter);
+            String stackTrace = stringWriter.toString();
+
+            PrintWriter writer = resp.getWriter();
+            CustomErrorHandler customErrorHandler = new CustomErrorHandler();
+            customErrorHandler.writeErrorPageMessage(req, writer, SC_INTERNAL_SERVER_ERROR, stackTrace, req.getRequestURI());
+
+            LOGGER.info(stackTrace);
         }
     }
 }

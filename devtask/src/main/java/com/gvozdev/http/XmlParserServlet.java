@@ -1,10 +1,10 @@
 package com.gvozdev.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gvozdev.error.CustomErrorHandler;
 import com.gvozdev.jaxb.Envelope;
 import com.gvozdev.service.TcpSenderService;
 import com.gvozdev.service.XmlParserService;
-import com.gvozdev.error.CustomErrorHandler;
 import com.gvozdev.serviceimpl.TcpSenderServiceImpl;
 import com.gvozdev.serviceimpl.XmlParserServiceImpl;
 import org.xml.sax.SAXException;
@@ -31,22 +31,27 @@ public class XmlParserServlet extends HttpServlet {
         try {
             Envelope envelope = xmlParserService.getEnvelopeFromHttpRequest(req, resp);
             LOGGER.info(new ObjectMapper().writeValueAsString(envelope));
+
             resp.setStatus(SC_ACCEPTED);
+
             writer.println(new ObjectMapper().writeValueAsString(envelope));
             writer.println("XML object has been handled successfully");
 
             TcpSenderService tcpSenderService = new TcpSenderServiceImpl();
-            tcpSenderService.sendData();
+            tcpSenderService.sendData(req, resp);
 
             writer.println("All data was successfully sent to tcp socket");
         } catch (JAXBException | SAXException e) {
             resp.setStatus(SC_BAD_REQUEST);
+
             StringWriter stringWriter = new StringWriter();
             PrintWriter printWriter = new PrintWriter(stringWriter);
             e.printStackTrace(printWriter);
+
             String stackTrace = stringWriter.toString();
             CustomErrorHandler customErrorHandler = new CustomErrorHandler();
             customErrorHandler.writeErrorPageMessage(req, writer, SC_BAD_REQUEST, stackTrace, req.getRequestURI());
+
             LOGGER.info(stackTrace);
         }
     }
